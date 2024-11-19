@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalhes do Filme</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="container my-5">
+    <h1 id="movie-title" class="text-center text-primary mb-4"></h1>
+    <div class="text-center mb-4">
+      <img id="movie-poster" class="img-fluid rounded" alt="Poster do Filme">
+    </div>
+    <p id="movie-description" class="text-justify"></p>
+    <ul id="movie-genres" class="list-inline text-center"></ul>
+    <div class="text-center mt-4">
+      <a href="index.html" class="btn btn-primary">Voltar</a>
+    </div>
+  </div>
+
+  <script>
+    // Captura o ID do filme da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieId = urlParams.get('id');
+
+    // Função para buscar os detalhes do filme
+    async function fetchMovieDetails() {
+      try {
+        const response = await fetch(`/api/movies/${movieId}`);
+        const movie = await response.json();
+
+        // Exibe os detalhes do filme na página
+        document.getElementById('movie-title').textContent = movie.title;
+        document.getElementById('movie-poster').src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+        document.getElementById('movie-description').textContent = movie.overview;
+
+        const genresList = document.getElementById('movie-genres');
+        genresList.innerHTML = movie.genres
+          .map(genre => `<li class="list-inline-item badge badge-secondary">${genre.name}</li>`)
+          .join('');
+      } catch (error) {
+        console.error('Erro ao buscar detalhes do filme:', error);
+        document.body.innerHTML = '<p class="text-center text-danger">Erro ao carregar os detalhes do filme.</p>';
+      }
+    }
+
+    fetchMovieDetails();
+  </script>
+</body>
+</html>

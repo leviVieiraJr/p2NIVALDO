@@ -1,0 +1,60 @@
+<div class="cabecalho">CATÁLOGO DE FILMES</div>
+
+<div id="movies" class="row mt-4">
+  <!-- Os filmes serão exibidos aqui -->
+</div>
+<link rel="stylesheet" href="css/style.css" />
+
+<script>
+  // Função para buscar filmes populares ou por título
+  async function fetchMovies(url) {
+    const moviesContainer = document.getElementById("movies");
+    moviesContainer.innerHTML = "<p>Carregando filmes...</p>";
+
+    try {
+      const response = await fetch(url);
+      const movies = await response.json();
+      moviesContainer.innerHTML = "";
+
+      if (movies.length === 0) {
+        moviesContainer.innerHTML = "<p>Nenhum filme encontrado.</p>";
+        return;
+      }
+
+      movies.forEach((movie) => {
+        const movieDiv = document.createElement("div");
+        movieDiv.className = "col-md-4 mb-3";
+        movieDiv.innerHTML = `
+          <div class="card">
+            <img src="https://image.tmdb.org/t/p/w500${
+              movie.poster_path
+            }" class="card-img-top" alt="Poster">
+            <div class="card-body">
+              <h5 class="card-title">${movie.title}</h5>
+              <p class="card-text">${
+                movie.release_date || "Data não disponível"
+              }</p>
+              <a href="movie.html?id=${
+                movie.id
+              }" class="btn btn-primary">Detalhes</a>
+            </div>
+          </div>
+        `;
+        moviesContainer.appendChild(movieDiv);
+      });
+    } catch (error) {
+      moviesContainer.innerHTML =
+        "<p>Erro ao carregar filmes. Tente novamente.</p>";
+      console.error("Erro ao buscar filmes:", error);
+    }
+  }
+
+  // Carregar filmes populares ao abrir a página
+  fetchMovies("/api/movies");
+
+  // Buscar filmes quando o usuário digitar algo
+  document.getElementById("search-button").addEventListener("click", () => {
+    const query = document.getElementById("search").value;
+    fetchMovies(`/api/movies/search?q=${query}`);
+  });
+</script>
